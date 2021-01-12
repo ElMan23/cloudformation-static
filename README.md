@@ -19,7 +19,7 @@ aws cloudformation deploy --template-file template.yaml --stack-name static-webs
 Upload the `index.html` to the S3 Bucket:
 
 ```powershell
-aws s3 sync index.html s3://elias-test-bucket-20210112 --acl public-read
+aws s3 cp .\index.html s3://elias-test-bucket-20210112 --acl public-read
 ```
 
 ## Delete
