@@ -4,15 +4,39 @@
 
 Taken from [here](https://adamtheautomator.com/aws-cli-cloudformation/).
 
+See also [this](https://medium.com/@kumargaurav1247/aws-s3-cli-commands-f367d0e10f4b#:~:text=%20AWS%20S3%20CLI%20Commands%20%201%20LIST:.,S3%20object.%20This%20allows%20anyone%20who...%20More).
+
 ## Deploy
 
 You need a configured AWS CLI on your machine to successfully deploy the static website.
 
-Deploy the static website with:
+Deploy the CloudFormation Template:
 
 ```powershell
 aws cloudformation deploy --template-file template.yaml --stack-name static-website
 ```
+
+Upload the `index.html` to the S3 Bucket:
+
+```powershell
+aws s3 sync index.html s3://elias-test-bucket-20210112 --acl public-read
+```
+
+## Delete
+
+Delete the file in the S3 Bucket:
+
+```powershell
+aws s3 rm s3://elias-test-bucket-20210112 --recursive
+```
+
+Finally, delete the CloudFormation Template:
+
+```powershell
+aws cloudformation delete-stack --stack-name static-website
+```
+
+Check that the stack gets deleted!
 
 ## Template
 
@@ -23,7 +47,7 @@ Resources:
   Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: your-bucket-name # use your own unique name
+      BucketName: your-bucket-name # Use your own UNIQUE name
       AccessControl: PublicRead
       WebsiteConfiguration:
         IndexDocument: index.html
