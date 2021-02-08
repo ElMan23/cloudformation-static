@@ -1,0 +1,65 @@
+stages:
+  - version
+  - build
+  - deploy
+
+# version_job:
+#   stage: version
+#   only:
+#     - master
+#   except:
+#     - tags
+#   script:
+#     - OLD_VERSION=`git describe --abbrev=0 --tags`
+#     - echo $OLD_VERSION
+#     - sed -i 's/\r//g' ./change-version.sh
+#     - NEW_VERSION=`bash ./change-version.sh m $OLD_VERSION`
+#     - echo ${NEW_VERSION} > version.txt
+#     - git config user.email "${GITLAB_USER_EMAIL}"
+#     - git config user.name "${GITLAB_USER_NAME}"
+#     - git add version.txt
+#     - git tag -a ${NEW_VERSION} -m "Pipeline-tagged"
+#     - git push https://oauth2:${GITLAB_ACCESS_TOKEN}@gitlab.com/${CI_PROJECT_PATH} ${NEW_VERSION}
+#   artifacts:
+#     paths:
+#       - ./version.txt
+
+# build: 
+#   stage: build
+#   only:
+#     - master
+#   except:
+#     - tags
+#   image: docker:19.03.8
+#   services:
+#     - docker:19.03.8-dind
+#   script:
+#   - VERSION=`cat ./version.txt`
+#   - IMAGE_NAME=registry.gitlab.com/elia.manara/cloudformation:${VERSION}
+#   - docker build -t ${IMAGE_NAME} .
+#   - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+#   - docker push ${IMAGE_NAME} 
+
+deploy:
+  stage: deploy
+  only:
+    - master
+  except:
+    - tags
+  image: registry.gitlab.com/gitlab-org/cloud-deploy/aws-base:latest
+  script:
+
+    # - apt update
+    # - apt install -y gettext
+
+    # - VERSION=`cat ./version.txt`
+    # - echo ${VERSION}
+    # - echo "export VERSION=${VERSION}" > .env
+    # - cat .env
+
+    # - source .env
+    # - echo ${VERSION}
+    # - envsubst < ./CloudFormationTemplate.yml > ./template.yml
+
+    - aws s3 cp .\index.html s3://elias-test-bucket-20210112 --acl public-read
+    - aws cloudformation deploy --template-file template.yaml --stack-name static-website
